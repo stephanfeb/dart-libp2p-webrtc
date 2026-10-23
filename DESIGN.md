@@ -497,3 +497,24 @@ go-libp2p relay with its default limits (see "go-libp2p interop").
 | Core changes (§4) | 2–4 days |
 | Browser interop + device testing | 2 weeks |
 | **Total** | **~6–9 weeks, one engineer** |
+
+## Releasing
+
+0.1.0 is tagged `v0.1.0`. Publishing needs dart_libp2p 4.9.0 on pub.dev
+first (prepared on dart-libp2p's `release/4.9.0` branch, commit 53129a3).
+Then, in this repository:
+
+1. Delete `pubspec_overrides.yaml` (and the app's), `dart pub get`, and run
+   the tests against the published dart_libp2p.
+2. `tool/check_package.sh`: builds the native library from exactly the
+   published file set (`.pubignore` uses anchored paths only, which the
+   script maps to rsync excludes).
+3. `dart pub publish --dry-run`. Expected: a notice about three
+   gitignored files under `third_party/libdatachannel/deps/json` (excluded
+   anyway; it comes from that submodule's `.gitignore`).
+4. Push the repository and tags to github.com/stephanfeb/dart-libp2p-webrtc,
+   then `dart pub publish`.
+
+The published package is the transport (`lib/` minus the interop harness),
+the build hook and the trimmed native sources (about 3 MB compressed); the
+interop harness, tools, Docker setup and this file stay in the repository.

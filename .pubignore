@@ -1,0 +1,41 @@
+# Published package: the transport, its native sources and build hook.
+# Kept to anchored directory/file patterns (see tool/check_package.sh).
+
+# Development only: interop harness (Node, Go, Playwright), tools, Docker,
+# design notes, local overrides.
+/interop/
+/tool/
+/docker/
+/DESIGN.md
+/pubspec_overrides.yaml
+/ffigen.yaml
+/dart_test.yaml
+/lib/interop.dart
+/lib/src/interop/
+/test/interop/
+/test/turn_test.dart
+/test/turn_server.dart
+/example/interop_app/
+/build/
+/.dart_tool/
+
+# Native sources not used by the data-channel-only build.
+/third_party/libdatachannel/examples/
+/third_party/libdatachannel/test/
+/third_party/libdatachannel/pages/
+/third_party/libdatachannel/deps/json/
+/third_party/libdatachannel/deps/libsrtp/
+/third_party/libdatachannel/deps/usrsctp/fuzzer/
+/third_party/libdatachannel/deps/libjuice/test/
+/third_party/libdatachannel/deps/libjuice/fuzzer/
+/third_party/libdatachannel/deps/plog/samples/
+/third_party/mbedtls/tests/
+/third_party/mbedtls/docs/
+/third_party/mbedtls/doxygen/
+/third_party/mbedtls/programs/
+/third_party/mbedtls/visualc/
+/third_party/mbedtls/ChangeLog.d/
+/third_party/mbedtls/framework/data_files/
+/third_party/mbedtls/framework/docs/
+/third_party/mbedtls/framework/psasim/
+/third_party/mbedtls/framework/history/
