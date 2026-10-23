@@ -1,5 +1,6 @@
 // The TURN fallback at the FFI layer: peer connections that may only use
-// relay candidates, through coturn (docker/coturn/compose.yaml, or TURN_URL).
+// relay candidates, through coturn (docker/coturn/compose.yaml, or TURN_URL),
+// and time-limited credentials from example/turn_credentials.dart.
 @Tags(['turn'])
 library;
 
@@ -10,6 +11,7 @@ import 'dart:typed_data';
 import 'package:dart_libp2p_webrtc/dart_libp2p_webrtc.dart';
 import 'package:test/test.dart';
 
+import '../example/turn_credentials.dart' as example;
 import 'turn_server.dart';
 
 Future<void> _connect(RtcPeerConnection offerer, RtcPeerConnection answerer) async {
@@ -80,5 +82,40 @@ void main() {
     offerer.createDataChannel('probe');
     final offer = await offerer.createOffer().timeout(const Duration(seconds: 30));
     expect(offer, isNot(contains('typ relay')));
+  });
+
+  group('time-limited credentials (use-auth-secret)', () {
+    String? secretSkip;
+    setUpAll(() async => secretSkip = await turnSecretUnavailable());
+
+    Future<String> offerWith(String url) {
+      final offerer = pc(RtcConfig(iceServers: [url], relayOnly: true));
+      offerer.createDataChannel('probe');
+      return offerer.createOffer().timeout(const Duration(seconds: 30));
+    }
+
+    test('credentials from example/turn_credentials.dart connect relay to relay', () async {
+      if (secretSkip != null) return markTestSkipped(secretSkip!);
+      final url = example.turnUrl('127.0.0.1', example.turnCredentials(turnSecret, 'alice'), port: turnSecretPort);
+      final offerer = pc(RtcConfig(iceServers: [url], relayOnly: true));
+      final answerer = pc(RtcConfig(iceServers: [url], relayOnly: true));
+      offerer.createDataChannel('echo');
+      await _connect(offerer, answerer).timeout(const Duration(seconds: 30));
+      expect(offerer.selectedCandidatePair!.local, contains('typ relay'));
+      expect(offerer.selectedCandidatePair!.remote, contains('typ relay'));
+    });
+
+    test('expired credentials give no relay candidates', () async {
+      if (secretSkip != null) return markTestSkipped(secretSkip!);
+      final expired = example.turnCredentials(turnSecret, 'alice', ttl: const Duration(minutes: -1));
+      expect(await offerWith(example.turnUrl('127.0.0.1', expired, port: turnSecretPort)), isNot(contains('typ relay')));
+    });
+
+    test('unencoded credentials give no relay candidates', () async {
+      if (secretSkip != null) return markTestSkipped(secretSkip!);
+      final c = example.turnCredentials(turnSecret, 'alice');
+      expect(await offerWith('turn:${c.username}:${c.password}@127.0.0.1:$turnSecretPort'),
+          isNot(contains('typ relay')));
+    });
   });
 }

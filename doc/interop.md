@@ -36,7 +36,10 @@ echo and 16 concurrent streams.
 
 TURN is tested with coturn: relay-only peers connect relay to relay, and a
 relay-only browser (strict `iceTransportPolicy: 'relay'`) connects to a Dart
-host in both directions, in Chrome and WebKit.
+host in both directions, in Chrome and WebKit. Time-limited credentials
+(`use-auth-secret`) from `example/turn_credentials.dart` connect; expired or
+unencoded ones give no relay candidates. See
+[Running a TURN server](turn.md).
 
 ## How the tests work
 

@@ -28,6 +28,22 @@ Future<String?> turnUnavailable() async {
   }
 }
 
+/// The docker/coturn server with time-limited credentials (use-auth-secret).
+const turnSecret = 'test-secret';
+const turnSecretPort = 3479;
+
+/// Why the use-auth-secret server can't be used, or null.
+Future<String?> turnSecretUnavailable() async {
+  try {
+    final socket = await Socket.connect('127.0.0.1', turnSecretPort, timeout: const Duration(seconds: 2));
+    socket.destroy();
+    return null;
+  } on SocketException {
+    return 'no TURN server at 127.0.0.1:$turnSecretPort; '
+        'run docker compose -f docker/coturn/compose.yaml up -d';
+  }
+}
+
 /// [turnUrl] as libp2p-page.js takes it: `turn`, `turnUser`, `turnPass`.
 Map<String, String> turnForBrowser() {
   final m = RegExp(r'^turn:([^:]+):([^@]+)@(.+)$').firstMatch(turnUrl)!;

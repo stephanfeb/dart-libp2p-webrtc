@@ -21,9 +21,9 @@ WebRtcTransport(
 - **STUN** tells a peer its public address, so peers behind NAT can find a
   path. Free public STUN servers are fine; js-libp2p uses some by default.
 - **TURN** relays the traffic when no direct path exists. TURN servers
-  carry real traffic, so you run one or pay for a hosted one. The URL is
-  `turn:<user>:<password>@<host>:<port>`, with the user and password
-  percent-encoded.
+  carry real traffic, so you run one ([Running a TURN server](turn.md)) or
+  pay for a hosted one. The URL is `turn:<user>:<password>@<host>:<port>`,
+  with the user and password percent-encoded.
 
 Give the browser the same TURN server, in js-libp2p's
 `webRTC({ rtcConfiguration: { iceServers: [...] } })`.
