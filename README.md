@@ -132,12 +132,13 @@ import { circuitRelayTransport } from '@libp2p/circuit-relay-v2'
 import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { identify } from '@libp2p/identify'
-import { multiaddr, registry } from '@multiformats/multiaddr'
+import { multiaddr } from '@multiformats/multiaddr'
 
 // Relays that also speak UDX (go-ricochet, dart-libp2p) list /udx addresses
 // in their reservations; without this codec js-libp2p rejects the whole
-// reservation ("Protocol 768 was unknown").
-registry.addProtocol({ code: 0x0300, name: 'udx', size: 0 })
+// reservation ("Protocol 768 was unknown"). Without the dependency instead:
+// registry.addProtocol({ code: 0x0300, name: 'udx', size: 0 })
+import '@stephanfeb/libp2p-udx/multiaddr' // 0.1.1+, browser-safe
 
 const node = await createLibp2p({
   addresses: { listen: ['/dns4/relay.example.com/tcp/443/wss/p2p/<relay-id>/p2p-circuit', '/webrtc'] },

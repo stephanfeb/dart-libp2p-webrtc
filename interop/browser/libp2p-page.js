@@ -21,7 +21,7 @@ const ECHO = '/test/echo/1.0.0'
 // #region udx-codec
 // UDX relays (go-ricochet) list their /udx address in reservations; without
 // the codec js-libp2p fails the whole reservation ("Protocol 768 was
-// unknown"). Same registration as js-udx's packages/libp2p-udx/src/multiaddr.ts.
+// unknown"). `import '@stephanfeb/libp2p-udx/multiaddr'` does the same.
 registry.addProtocol({ code: 0x0300, name: 'udx', size: 0 })
 // #endregion udx-codec
 const params = new URLSearchParams(location.search)

@@ -47,15 +47,35 @@ npm install libp2p @libp2p/websockets @libp2p/webrtc @libp2p/circuit-relay-v2 \
 ```
 
 If the relay also speaks UDX, as go-ricochet and dart_libp2p relays can,
-register the UDX multiaddr codec first. The relay lists its `/udx` address in
-the reservation it grants, and without the codec js-libp2p rejects the whole
-reservation with `Protocol 768 was unknown`:
+register the UDX multiaddr codec before creating the node. The relay lists
+its `/udx` address in the reservation it grants, and without the codec
+js-libp2p rejects the whole reservation with `Protocol 768 was unknown`.
+
+The browser entry of [js-udx](../../js-udx/doc/libp2p.md)'s libp2p package
+(0.1.1 or later) registers it, and has no Node.js code, so it bundles for
+the browser:
+
+```sh
+npm install @stephanfeb/libp2p-udx
+```
+
+```js
+import '@stephanfeb/libp2p-udx/multiaddr'
+```
+
+Import that entry, not the package root: the root brings in the UDX
+transport, which needs Node.js. The app and the package must share one copy
+of `@multiformats/multiaddr` (they do with js-libp2p v3; `npm ls
+@multiformats/multiaddr` shows the copies you have).
+
+Or, without the dependency, register the codec yourself. It's one line, and
+it's what the test page does:
 
 <!-- example: interop/browser/libp2p-page.js#udx-codec -->
 ```js
 // UDX relays (go-ricochet) list their /udx address in reservations; without
 // the codec js-libp2p fails the whole reservation ("Protocol 768 was
-// unknown"). Same registration as js-udx's packages/libp2p-udx/src/multiaddr.ts.
+// unknown"). `import '@stephanfeb/libp2p-udx/multiaddr'` does the same.
 registry.addProtocol({ code: 0x0300, name: 'udx', size: 0 })
 ```
 <!-- /example -->
