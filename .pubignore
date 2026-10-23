@@ -15,6 +15,7 @@
 /test/interop/
 /test/turn_test.dart
 /test/turn_server.dart
+/test/examples_test.dart
 /example/interop_app/
 /build/
 /.dart_tool/

@@ -20,6 +20,11 @@ separately.
         └──────────────── direct WebRTC (DTLS, SCTP data channels) ─────────────┘
 ```
 
+**Documentation:** guides for getting started, browsers, Flutter and mobile,
+networks (STUN, TURN, NAT) and the internals are at
+[cryptopeer.net/libp2p/webrtc](https://cryptopeer.net/libp2p/webrtc/), from
+this repository's [`doc/`](doc/index.md).
+
 ## Status
 
 0.1.0: the first release. Tested:

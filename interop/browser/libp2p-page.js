@@ -18,10 +18,12 @@ import { createLibp2p } from 'libp2p'
 
 const ECHO = '/test/echo/1.0.0'
 
+// #region udx-codec
 // UDX relays (go-ricochet) list their /udx address in reservations; without
 // the codec js-libp2p fails the whole reservation ("Protocol 768 was
 // unknown"). Same registration as js-udx's packages/libp2p-udx/src/multiaddr.ts.
 registry.addProtocol({ code: 0x0300, name: 'udx', size: 0 })
+// #endregion udx-codec
 const params = new URLSearchParams(location.search)
 const target = multiaddr(params.get('target'))
 const relay = params.get('relay')
@@ -54,6 +56,7 @@ function equal (a, b) {
   return true
 }
 
+// #region echo-client
 /** Sends `data` on a fresh echo stream, half-closes, and returns the reply. */
 async function echo (connection, data) {
   const stream = await connection.newStream(ECHO)
@@ -71,8 +74,10 @@ async function echo (connection, data) {
   await stream.close()
   return reply
 }
+// #endregion echo-client
 
 async function run () {
+  // #region node
   const node = await createLibp2p({
     addresses: { listen: [`${relay}/p2p-circuit`, '/webrtc'] },
     transports: [webSockets(), webRTC({ rtcConfiguration }), circuitRelayTransport()],
@@ -90,9 +95,12 @@ async function run () {
     }
     await stream.close()
   })
+  // #endregion node
 
   const started = performance.now()
+  // #region dial
   const connection = await node.dial(target, { signal: AbortSignal.timeout(30_000) })
+  // #endregion dial
   result('dial', true, `${connection.remoteAddr} in ${Math.round(performance.now() - started)} ms; ` +
     `muxer ${connection.multiplexer ?? '-'}, encryption ${connection.encryption ?? '-'}, ` +
     `limited ${connection.limits != null}, direction ${connection.direction}`)
