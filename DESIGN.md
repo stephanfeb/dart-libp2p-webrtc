@@ -501,7 +501,7 @@ go-libp2p relay with its default limits (see "go-libp2p interop").
 ## Releasing
 
 0.1.0 is tagged `v0.1.0`. Publishing needs dart_libp2p 4.9.0 on pub.dev
-first (dart-libp2p `main`, tagged `v4.9.0` at 53129a3, not yet pushed).
+first (dart-libp2p `main`, tagged `v4.9.0` at 3f1f280, not yet pushed).
 Then, in this repository:
 
 1. Delete `pubspec_overrides.yaml` (and the app's), `dart pub get`, and run
