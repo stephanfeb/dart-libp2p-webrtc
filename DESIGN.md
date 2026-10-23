@@ -500,9 +500,10 @@ go-libp2p relay with its default limits (see "go-libp2p interop").
 
 ## Releasing
 
-0.1.0 is tagged `v0.1.0`. dart_libp2p 4.9.0 is on pub.dev, and the package
-and the example app resolve it from there (no `pubspec_overrides.yaml`). For
-each release:
+0.1.0 is published on pub.dev (tag `v0.1.0`), with dart_libp2p 4.9.0 from
+pub.dev (no `pubspec_overrides.yaml`). The guides in `doc/` are published on
+cryptopeer.net/libp2p/webrtc/ (synced by the cryptopeer.net repo, which
+redeploys on a push there). For each release:
 
 1. `dart test` (with `NODE` for the browser tests) and `flutter analyze` in
    `example/interop_app`.
