@@ -13,17 +13,16 @@ import { identify } from '@libp2p/identify'
 import { ping } from '@libp2p/ping'
 import { webRTC } from '@libp2p/webrtc'
 import { webSockets } from '@libp2p/websockets'
-import { multiaddr, registry } from '@multiformats/multiaddr'
+import { multiaddr } from '@multiformats/multiaddr'
+// #region udx-codec
+// UDX relays (go-ricochet) list their /udx address in reservations; without
+// the UDX codec js-libp2p fails the whole reservation ("Protocol 768 was
+// unknown"). This browser entry registers it.
+import '@stephanfeb/libp2p-udx/multiaddr'
+// #endregion udx-codec
 import { createLibp2p } from 'libp2p'
 
 const ECHO = '/test/echo/1.0.0'
-
-// #region udx-codec
-// UDX relays (go-ricochet) list their /udx address in reservations; without
-// the codec js-libp2p fails the whole reservation ("Protocol 768 was
-// unknown"). `import '@stephanfeb/libp2p-udx/multiaddr'` does the same.
-registry.addProtocol({ code: 0x0300, name: 'udx', size: 0 })
-// #endregion udx-codec
 const params = new URLSearchParams(location.search)
 const target = multiaddr(params.get('target'))
 const relay = params.get('relay')

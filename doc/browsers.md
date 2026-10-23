@@ -59,26 +59,29 @@ the browser:
 npm install @stephanfeb/libp2p-udx
 ```
 
+The test page imports it before anything else uses multiaddrs:
+
+<!-- example: interop/browser/libp2p-page.js#udx-codec -->
 ```js
+// UDX relays (go-ricochet) list their /udx address in reservations; without
+// the UDX codec js-libp2p fails the whole reservation ("Protocol 768 was
+// unknown"). This browser entry registers it.
 import '@stephanfeb/libp2p-udx/multiaddr'
 ```
+<!-- /example -->
 
 Import that entry, not the package root: the root brings in the UDX
 transport, which needs Node.js. The app and the package must share one copy
 of `@multiformats/multiaddr` (they do with js-libp2p v3; `npm ls
 @multiformats/multiaddr` shows the copies you have).
 
-Or, without the dependency, register the codec yourself. It's one line, and
-it's what the test page does:
+Or, without the dependency, register the codec yourself. It's one line:
 
-<!-- example: interop/browser/libp2p-page.js#udx-codec -->
 ```js
-// UDX relays (go-ricochet) list their /udx address in reservations; without
-// the codec js-libp2p fails the whole reservation ("Protocol 768 was
-// unknown"). `import '@stephanfeb/libp2p-udx/multiaddr'` does the same.
+import { registry } from '@multiformats/multiaddr'
+
 registry.addProtocol({ code: 0x0300, name: 'udx', size: 0 })
 ```
-<!-- /example -->
 
 Then create the node. It listens on `<relay>/p2p-circuit`, which books a
 reservation on that relay, and on `/webrtc`, which accepts WebRTC

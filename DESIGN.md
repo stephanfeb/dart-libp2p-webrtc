@@ -201,6 +201,11 @@ signaling):
 - iPhone on cellular, Mac and Chrome at home (two sessions): Chrome dials
   the phone through ricochet in 1.1–1.2 s, phone dials Chrome back in
   0.7–0.8 s; pings 28–133 ms; 1 MiB round trips 1.5–8 s (cellular).
+- Same setup, with the browser page using the published
+  `@stephanfeb/libp2p-udx/multiaddr` 0.1.1 from npm for the UDX codec
+  (instead of registering it inline): Chrome dials the phone in 1.7 s,
+  phone dials Chrome back in 0.9 s; pings 51–137 ms; 1 MiB round trips
+  3–11 s, all srflx ↔ srflx or host ↔ srflx over IPv6.
 
 Every off-LAN path ran over IPv6 (the carrier's IPv6 has no NAT; the home
 router's IPv6 was enabled during testing). With IPv4 only on one side and
