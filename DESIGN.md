@@ -500,12 +500,12 @@ go-libp2p relay with its default limits (see "go-libp2p interop").
 
 ## Releasing
 
-0.1.0 is tagged `v0.1.0`. Publishing needs dart_libp2p 4.9.0 on pub.dev
-first (dart-libp2p `main`, tagged `v4.9.0` at 3f1f280, not yet pushed).
-Then, in this repository:
+0.1.0 is tagged `v0.1.0`. dart_libp2p 4.9.0 is on pub.dev, and the package
+and the example app resolve it from there (no `pubspec_overrides.yaml`). For
+each release:
 
-1. Delete `pubspec_overrides.yaml` (and the app's), `dart pub get`, and run
-   the tests against the published dart_libp2p.
+1. `dart test` (with `NODE` for the browser tests) and `flutter analyze` in
+   `example/interop_app`.
 2. `tool/check_package.sh`: builds the native library from exactly the
    published file set (`.pubignore` uses anchored paths only, which the
    script maps to rsync excludes).

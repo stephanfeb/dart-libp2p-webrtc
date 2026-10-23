@@ -130,19 +130,20 @@ packages:
     source: hosted
     version: "1.0.9"
   dart_libp2p:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../../../dart-libp2p"
-      relative: true
-    source: path
-    version: "4.8.2"
+      name: dart_libp2p
+      sha256: f3aa0063c405122d415768b6dc07b3f3530e44d023a2e7228706dcb7eff0a374
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.9.0"
   dart_libp2p_webrtc:
     dependency: "direct main"
     description:
       path: "../.."
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.0"
   dart_multihash:
     dependency: transitive
     description:
