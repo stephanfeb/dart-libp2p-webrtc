@@ -1,0 +1,5 @@
+.dart_tool/
+build/
+.git/
+**/.git
+interop/browser/node_modules/

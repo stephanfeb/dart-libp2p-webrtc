@@ -1,0 +1,6 @@
+# Builds against the sibling dart-libp2p checkout (main, through 71caf58)
+# until its UpgradedTransportConn support is released to pub.dev.
+# dart_udx still resolves from pub.dev.
+dependency_overrides:
+  dart_libp2p:
+    path: ../dart-libp2p

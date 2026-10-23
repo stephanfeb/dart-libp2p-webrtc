@@ -1,0 +1,8 @@
+tags:
+  # Drives a real browser via interop/browser (npm install there first).
+  # Skipped automatically when Playwright isn't installed.
+  browser:
+    timeout: 2x
+  # Needs a TURN server: docker/coturn/compose.yaml, or TURN_URL.
+  # Skipped automatically when none answers.
+  turn:

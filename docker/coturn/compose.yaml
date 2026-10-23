@@ -1,0 +1,12 @@
+# TURN server for the fallback tests: docker compose -f docker/coturn/compose.yaml up -d
+services:
+  coturn:
+    image: coturn/coturn:latest
+    container_name: webrtc-test-coturn
+    command: ["-c", "/etc/coturn/turnserver.conf"]
+    volumes:
+      - ./turnserver.conf:/etc/coturn/turnserver.conf:ro
+    ports:
+      - "3478:3478/udp"
+      - "3478:3478/tcp"
+      - "49160-49200:49160-49200/udp"
