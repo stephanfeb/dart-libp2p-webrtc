@@ -1,0 +1,4 @@
+# Same dart-libp2p as the package (see ../../pubspec_overrides.yaml).
+dependency_overrides:
+  dart_libp2p:
+    path: ../../../dart-libp2p

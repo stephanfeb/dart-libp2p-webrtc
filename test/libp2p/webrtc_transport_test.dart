@@ -21,10 +21,10 @@ import 'package:dart_libp2p/p2p/protocol/circuitv2/client/reservation.dart';
 import 'package:dart_libp2p/p2p/protocol/ping/ping.dart';
 import 'package:dart_libp2p/p2p/transport/connection_manager.dart';
 import 'package:dart_libp2p/p2p/transport/tcp_transport.dart';
+import 'package:dart_libp2p_webrtc/interop.dart';
 import 'package:dart_libp2p_webrtc/libp2p.dart';
 import 'package:test/test.dart';
 
-import '../interop/relays.dart';
 import '../turn_server.dart';
 
 const _echo = '/test/echo/1.0.0';

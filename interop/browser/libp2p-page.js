@@ -13,10 +13,15 @@ import { identify } from '@libp2p/identify'
 import { ping } from '@libp2p/ping'
 import { webRTC } from '@libp2p/webrtc'
 import { webSockets } from '@libp2p/websockets'
-import { multiaddr } from '@multiformats/multiaddr'
+import { multiaddr, registry } from '@multiformats/multiaddr'
 import { createLibp2p } from 'libp2p'
 
 const ECHO = '/test/echo/1.0.0'
+
+// UDX relays (go-ricochet) list their /udx address in reservations; without
+// the codec js-libp2p fails the whole reservation ("Protocol 768 was
+// unknown"). Same registration as js-udx's packages/libp2p-udx/src/multiaddr.ts.
+registry.addProtocol({ code: 0x0300, name: 'udx', size: 0 })
 const params = new URLSearchParams(location.search)
 const target = multiaddr(params.get('target'))
 const relay = params.get('relay')
@@ -30,8 +35,11 @@ const rtcConfiguration = turn == null
       iceTransportPolicy: 'relay'
     }
 
+// Echoed in every result, so one driver can run several pages.
+const runId = params.get('run')
+
 function result (name, ok, detail) {
-  console.log(`RESULT ${JSON.stringify({ name, ok, detail })}`)
+  console.log(`RESULT ${JSON.stringify({ run: runId, name, ok, detail })}`)
 }
 
 function pattern (length, seed) {

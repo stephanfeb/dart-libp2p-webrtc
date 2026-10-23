@@ -152,6 +152,70 @@ between its own allocations. A browser may still label its local candidate
 `prflx` (the NAT-mapped address of its relay), which the test allows.
 Not yet tested: a real TURN deployment over cellular (the actual target).
 
+### Phones on the full libp2p stack (2026-10-23)
+
+`tool/libp2p_hub.dart` (desktop: go relay on the LAN, a Dart host, headless
+Chrome) and the app's "libp2p over WebRTC" section
+(`lib/src/interop/libp2p_phone.dart`) run a session per phone in four
+directions: Dart → phone, browser → phone, phone → Dart, phone → browser;
+each is relayed connect, WebRTC upgrade, ping, 1 KiB / 1 MiB echo and 16
+concurrent streams. `test/interop/libp2p_hub_test.dart` runs the same on
+the desktop. Test hosts listen on `/webrtc` only, so on a shared LAN an
+upgrade cannot end on a direct TCP connection instead.
+
+Wi-Fi results: Pixel 10a (Android 17) 25/25 and iPhone (iOS 26.6) 25/25,
+host↔host paths, pings 6–21 ms, 1 MiB round trips at 4–6 MB/s.
+
+Fixed on the way: the iOS library failed to load because it linked Mbed
+TLS's everest and p256m as separate dylibs that were never bundled.
+`BUILD_SHARED_LIBS` was a forced cache variable, so a re-configured build
+directory built them shared; it is now a plain variable per subproject.
+`test/native_library_test.dart` checks (macOS) that the library links only
+system libraries.
+
+Open: with the iPhone on Wi-Fi, one Dart → phone connection reported the
+phone's cellular IPv6 address as its remote while the Mac had no IPv6;
+unexplained (likely what libdatachannel reports, not the path used).
+Off-LAN: see "In the wild through go-ricochet" below.
+
+### In the wild through go-ricochet (2026-10-23)
+
+The public go-ricochet relay (go-libp2p, default relay limits) is the only
+infrastructure: phones and Dart hosts reach it over UDX
+(`/ip4/152.42.240.103/udp/55223/udx`), browsers over WSS
+(`/dns4/ricochet.spiffyvault.net/tcp/55223/wss`, or plain `/ws` from http
+pages). Test hosts dial relays over TCP or UDX.
+
+Coordination moved onto libp2p so phones work from any network: the phone
+reserves on the relay and opens `/webrtc-interop/dial-back/1.0.0` to the
+hub's Dart host through it (`lib/src/interop/libp2p_dialback.dart`); the
+hub's Dart host and headless Chrome dial the phone over `/webrtc` and stream
+results back on that stream; then the phone dials both and reports on
+`/webrtc-interop/report/1.0.0`. `tool/libp2p_hub.dart --relay <udx>
+--relay-browser <wss>` (persistent hub identity in build/) and
+`tool/ricochet_session_check.dart` (the whole session from one machine).
+
+Results, 25/25 per session, every direction direct (the relay carries only
+signaling):
+- Pixel on home Wi-Fi: Dart and Chrome ↔ phone, IPv6 and IPv4 host paths.
+- iPhone on cellular, Mac and Chrome at home (two sessions): Chrome dials
+  the phone through ricochet in 1.1–1.2 s, phone dials Chrome back in
+  0.7–0.8 s; pings 28–133 ms; 1 MiB round trips 1.5–8 s (cellular).
+
+Every off-LAN path ran over IPv6 (the carrier's IPv6 has no NAT; the home
+router's IPv6 was enabled during testing). With IPv4 only on one side and
+the carrier's symmetric NAT on the other, direct WebRTC fails (see "Phones,
+cellular" above), so production still needs TURN (proven with coturn; a
+hosted service, configured in the app and the web page).
+
+Interop finding: js-libp2p rejects a whole relay reservation whose
+addresses include `/udx` ("Protocol 768 was unknown"). Web apps using
+go-ricochet must register the codec first:
+`registry.addProtocol({ code: 0x0300, name: 'udx', size: 0 })` from
+`@multiformats/multiaddr`, as js-udx's `packages/libp2p-udx/src/multiaddr.ts`
+does. (Alternatively the relay could leave `/udx` out of reservations made
+over WebSockets.)
+
 ## 1. Package layout
 
 A separate package so `dart_libp2p` stays pure Dart with no native build.

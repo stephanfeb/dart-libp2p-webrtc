@@ -12,6 +12,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5) # usrsctp/plog declare old minimums
 
 # --- Mbed TLS (static, linked into libdatachannel) ---
+# Plain (not cache) variables, so a re-configure cannot carry one part's
+# setting into the other: with BUILD_SHARED_LIBS on, Mbed TLS builds its
+# 3rdparty everest and p256m as separate shared libraries that nothing ships.
+set(BUILD_SHARED_LIBS OFF)
 set(ENABLE_PROGRAMS OFF CACHE BOOL "" FORCE)
 set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 set(MBEDTLS_FATAL_WARNINGS OFF CACHE BOOL "" FORCE)
@@ -32,7 +36,8 @@ set(NO_MEDIA ON CACHE BOOL "" FORCE)
 set(NO_WEBSOCKET ON CACHE BOOL "" FORCE)
 set(NO_EXAMPLES ON CACHE BOOL "" FORCE)
 set(NO_TESTS ON CACHE BOOL "" FORCE)
-set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+# The one shared library (libdatachannel builds its own deps statically).
+set(BUILD_SHARED_LIBS ON)
 add_subdirectory(${THIRD_PARTY}/libdatachannel libdatachannel)
 
 # Ship a single unversioned file (libdatachannel.{so,dylib}, datachannel.dll):

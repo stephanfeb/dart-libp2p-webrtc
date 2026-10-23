@@ -35,7 +35,6 @@ import 'package:dart_libp2p_webrtc/libp2p.dart';
 import 'package:test/test.dart';
 
 import '../turn_server.dart';
-import 'relays.dart';
 
 final _dir = Directory('interop/browser');
 const _echo = '/test/echo/1.0.0';

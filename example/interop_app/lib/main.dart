@@ -1,13 +1,17 @@
 // Runs the dart_libp2p_webrtc browser interop scenarios on a phone against a
-// browser driven by tool/interop_server.dart on a desktop.
+// browser driven by tool/interop_server.dart on a desktop, and a libp2p
+// session against tool/libp2p_hub.dart.
 //
-//   flutter run --dart-define=INTEROP_SERVER=ws://<desktop-ip>:8787
+//   flutter run --dart-define=INTEROP_SERVER=ws://<desktop-ip>:8787 \
+//     --dart-define=LIBP2P_HUB=http://<desktop-ip>:8788
 import 'dart:io';
 
 import 'package:dart_libp2p_webrtc/dart_libp2p_webrtc.dart';
 import 'package:dart_libp2p_webrtc/interop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'libp2p_section.dart';
 
 const _defaultServer = String.fromEnvironment('INTEROP_SERVER');
 const _stunServer = 'stun:stun.l.google.com:19302';
@@ -40,6 +44,7 @@ class _InteropPageState extends State<InteropPage> {
   String? _current;
   final _reports = <String, ScenarioReport>{};
   List<NatCheckResult>? _nat;
+  String? _libp2pReport;
   bool _checkingNat = false;
 
   Future<void> _checkNat() async {
@@ -98,6 +103,7 @@ class _InteropPageState extends State<InteropPage> {
         'dart_libp2p_webrtc interop — ${Platform.operatingSystem} ${Platform.operatingSystemVersion}',
         'server ${_server.text}, stun $_useStun',
         if (_nat != null) ...['NAT check:', for (final r in _nat!) '$r'],
+        ?_libp2pReport,
         for (final r in _reports.values) ...[
           '$r',
           if (r.browserCandidateTypes.isNotEmpty) '  browser candidates: ${r.browserCandidateTypes.join(', ')}',
@@ -118,7 +124,7 @@ class _InteropPageState extends State<InteropPage> {
           IconButton(
             tooltip: 'Copy report',
             icon: const Icon(Icons.copy),
-            onPressed: _reports.isEmpty && _nat == null
+            onPressed: _reports.isEmpty && _nat == null && _libp2pReport == null
                 ? null
                 : () => Clipboard.setData(ClipboardData(text: _reportText)),
           ),
@@ -174,6 +180,11 @@ class _InteropPageState extends State<InteropPage> {
             ),
           const SizedBox(height: 8),
           for (final name in scenarios.keys) _ScenarioTile(name: name, report: _reports[name], running: _current == name),
+          const Divider(height: 32),
+          Libp2pSection(
+            iceServers: _useStun ? const [_stunServer] : const [],
+            onReport: (text) => setState(() => _libp2pReport = text),
+          ),
         ],
       ),
     );

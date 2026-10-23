@@ -1,12 +1,13 @@
 // Circuit relay v2 servers from other libp2p implementations, as separate
 // processes: js-libp2p (interop/browser/relay.mjs) and go-libp2p
-// (interop/go/relay), each listening on loopback TCP and WebSockets.
+// (interop/go/relay), each listening on TCP and WebSockets. Paths are
+// relative to the repository root.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_libp2p/core/peer/peer_id.dart';
-import 'package:dart_libp2p_webrtc/interop.dart';
+import 'browser_driver.dart';
 
 final _browserDir = Directory('interop/browser');
 final _goDir = Directory('interop/go');
@@ -21,9 +22,18 @@ class ExternalRelay {
   /// `/ip4/127.0.0.1/tcp/<port>/ws/p2p/<id>`, for browsers.
   final String ws;
 
+  /// Every address the relay listens on (with `/p2p/<id>`).
+  final List<String> addrs;
+
   final Process _process;
 
-  ExternalRelay._(this.kind, this.peerId, this.tcp, this.ws, this._process);
+  ExternalRelay._(this.kind, this.peerId, this.tcp, this.ws, this.addrs, this._process);
+
+  /// The TCP address on a private IPv4 network (for phones on the LAN), if
+  /// the relay listens on one.
+  String? get lanTcp => addrs
+      .where((a) => !a.contains('/ws') && RegExp(r'^/ip4/(10|172\.(1[6-9]|2\d|3[01])|192\.168)\.').hasMatch(a))
+      .firstOrNull;
 
   /// Why [kind] can't run here, or null if it can.
   static Future<String?> unavailable(String kind) async {
@@ -52,11 +62,12 @@ class ExternalRelay {
     }
   }
 
-  /// Starts the relay; [unavailable] must have returned null.
-  static Future<ExternalRelay> start(String kind) async {
+  /// Starts the relay; [unavailable] must have returned null. [args] go to
+  /// the go relay (e.g. `-ip 0.0.0.0 -tcp 4001`).
+  static Future<ExternalRelay> start(String kind, {List<String> args = const []}) async {
     final process = kind == 'js'
         ? await Process.start(nodeExecutable, ['relay.mjs'], workingDirectory: _browserDir.path)
-        : await Process.start('build/relay', const [], workingDirectory: _goDir.path);
+        : await Process.start('build/relay', args, workingDirectory: _goDir.path);
     process.stderr.transform(utf8.decoder).listen(stderr.write);
     final first = Completer<Map<String, dynamic>>();
     process.stdout.transform(utf8.decoder).transform(const LineSplitter()).listen((line) {
@@ -69,6 +80,7 @@ class ExternalRelay {
       PeerId.fromString(info['peerId'] as String),
       addrs.firstWhere((a) => !a.contains('/ws')),
       addrs.firstWhere((a) => a.contains('/ws')),
+      addrs,
       process,
     );
   }

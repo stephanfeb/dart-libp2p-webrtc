@@ -112,9 +112,13 @@ class WebRtcTransport implements Transport {
     return initiateWebRtc(stream, config: rtcConfig, timeout: limit);
   }
 
-  /// Opens a WebRTC connection to [peer], which must be connected through a
-  /// relay. It joins the host's connections, so new streams to [peer] prefer
-  /// it over the relayed one.
+  /// Opens a direct connection to [peer], which must be connected through a
+  /// relay, and returns it. It joins the host's connections, so new streams
+  /// to [peer] prefer it over the relayed one.
+  ///
+  /// The swarm dials every direct address it knows for [peer], as for a
+  /// hole punch, so a reachable TCP or UDX address of the peer can win over
+  /// WebRTC; the result is then not a WebRTC connection.
   Future<Conn> upgrade(PeerId peer) async {
     final host = _attached;
     final relayed = host.network
